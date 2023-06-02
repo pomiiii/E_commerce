@@ -1,12 +1,19 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
+
 package User;
 
+import dao.ProductDao;
+import dao.PurchaseDao;
 import java.awt.Color;
+import java.awt.print.PrinterException;
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -14,19 +21,29 @@ import java.util.logging.Logger;
  */
 public class Purchase extends javax.swing.JFrame {
 
-    
-
     /**
      * Creates new form Purchase
      */
+    PurchaseDao purchaseDao = new PurchaseDao();
+    ProductDao productDao = new ProductDao();
     Color textPrimaryColor = new Color(102, 120, 130);
     Color primaryColor = new Color(42, 58, 73);
     int xx, xy;
-    
-    
-    
+    private int qty = 0;
+    private double price = 0.0;
+    private double total = 0.0;
+    private int pId;
+    DefaultTableModel model;
+    int rowIndex;
+    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+    Date date = new Date();
+
     public Purchase() {
         initComponents();
+        init();
+        productsTable();
+        purchaseTable();
+        pId = purchaseDao.getMaxRow();
     }
 
     /**
@@ -59,6 +76,8 @@ public class Purchase extends javax.swing.JFrame {
         jLabel11 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setUndecorated(true);
+        setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowOpened(java.awt.event.WindowEvent evt) {
                 formWindowOpened(evt);
@@ -91,6 +110,11 @@ public class Purchase extends javax.swing.JFrame {
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
+            }
+        });
+        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable1MouseClicked(evt);
             }
         });
         jScrollPane1.setViewportView(jTable1);
@@ -137,9 +161,19 @@ public class Purchase extends javax.swing.JFrame {
                 jTextField4ActionPerformed(evt);
             }
         });
+        jTextField4.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jTextField4KeyTyped(evt);
+            }
+        });
 
         jButton1.setFont(new java.awt.Font("Segoe UI Semibold", 0, 14)); // NOI18N
         jButton1.setText("Print");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jButton2.setFont(new java.awt.Font("Segoe UI Semibold", 0, 14)); // NOI18N
         jButton2.setText("Purchase");
@@ -150,10 +184,15 @@ public class Purchase extends javax.swing.JFrame {
         });
 
         jButton3.setFont(new java.awt.Font("Segoe UI Semibold", 0, 14)); // NOI18N
-        jButton3.setText("Add");
+        jButton3.setText("Clear");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         jButton4.setFont(new java.awt.Font("Segoe UI Semibold", 0, 14)); // NOI18N
-        jButton4.setText("Add");
+        jButton4.setText("Add to cart");
         jButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton4ActionPerformed(evt);
@@ -217,11 +256,11 @@ public class Purchase extends javax.swing.JFrame {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(37, 37, 37)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
+                            .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(34, 34, 34)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE)
                             .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(126, 126, 126)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -280,9 +319,9 @@ public class Purchase extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -292,13 +331,123 @@ public class Purchase extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void init() {
+        jTextField2.setText(String.valueOf(purchaseDao.getMaxRow()));
+    }
+
+    private void productsTable() {
+        productDao.getProductsValue(jTable1, "");
+        model = (DefaultTableModel) jTable1.getModel();
+        jTable1.setRowHeight(30);
+        jTable1.setShowGrid(true);
+        jTable1.setGridColor(Color.BLACK);
+        jTable1.setBackground(Color.WHITE);
+        jTable1.setSelectionBackground(Color.LIGHT_GRAY);
+    }
+
+    private void purchaseTable() {
+        //cat.getCategoriesValue(jTable1, "");
+        model = (DefaultTableModel) jTable2.getModel();
+        jTable2.setRowHeight(30);
+        jTable2.setShowGrid(true);
+        jTable2.setGridColor(Color.BLACK);
+        jTable2.setBackground(Color.WHITE);
+        jTable2.setSelectionBackground(Color.LIGHT_GRAY);
+    }
+
+    private void clear() {
+        jTextField2.setText(String.valueOf(purchaseDao.getMaxRow()));
+        jTextField3.setText("");
+        jTextField4.setText("0");
+        jTextField1.setText("");
+        jTable1.clearSelection();
+        price = 0.0;
+        qty = 0;
+    }
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
+        model = (DefaultTableModel) jTable1.getModel();
+        if (model.getRowCount() > 0) {
+            String[] value = new String[5];
+            String email;
+            //String email = userDashboard.userEmail.getText();
+            //value = purchaseDao.getUserValue(email);
+            int uid = Integer.parseInt(value[0]);
+            String uname = value[1];
+            String uphone = value[2];
+            String address = value[3] + "," + value[4];
+            String purchaseDate = df.format(date);
+            for (int i = 0; i < model.getRowCount(); i++) {
+                int id = Integer.parseInt(model.getValueAt(i, 0).toString());
+                int pid = Integer.parseInt(model.getValueAt(i, 1).toString());
+                String pname = model.getValueAt(i, 2).toString();
+                int q = Integer.parseInt(model.getValueAt(i, 3).toString());
+                double pri = Double.parseDouble(model.getValueAt(i, 4).toString());
+                double tot = Double.parseDouble(model.getValueAt(i, 5).toString());
+                purchaseDao.insert(id, uid, uname, uphone, pid, pname, q, pri, tot, purchaseDate, address, null, null, "Pending");
+                int newQuantity = purchaseDao.getQty(pid) - q;
+                purchaseDao.qtyUpdate(pid, newQuantity);
+                setDefault();
+
+            }
+            JOptionPane.showMessageDialog(this, "Successfully purchased", "Warning", 2);
+        } else {
+            JOptionPane.showMessageDialog(this, "You havent purchased any product", "Warning", 2);
+        }
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        // TODO add your handling code here:
+        if (jTextField3.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please select a product", "Warning", 2);
+        } else if (jTextField4.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Product quantity is required", "Warning", 2);
+        } else {
+            model = (DefaultTableModel) jTable1.getModel();
+            int proId = Integer.parseInt(model.getValueAt(rowIndex, 0).toString());
+            if (!isProductExist(proId)) {
+                if (!(qty < 0)) {
+                    int newQty = Integer.parseInt(jTextField4.getText());
+                    if (newQty != 0) {
+                        if (!(newQty > qty)) {
+                            String pname = jTextField3.getText();
+                            String t = String.format("%.2f", price * (double) newQty);
+                            Object[] data = {pId, proId, pname, newQty, price, t};
+                            model = (DefaultTableModel) jTable2.getModel();
+                            model.addRow(data);
+                            total += price * (double) newQty;
+                            jLabel5.setText(String.format("Total: " + "%.2f", total));
+                            pId++;
+                            clear();
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Not enough stock", "Warning", 2);
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Please increase the product quantity", "Warning", 2);
+                    }
+
+                } else {
+                    JOptionPane.showMessageDialog(this, "Stock is empty", "Warning", 2);
+                }
+
+            } else {
+                JOptionPane.showMessageDialog(this, "PLease select a product", "Warning", 2);
+            }
+        }
     }//GEN-LAST:event_jButton4ActionPerformed
+
+    private boolean isProductExist(int proId) {
+        model = (DefaultTableModel) jTable2.getModel();
+        if (model.getRowCount() > 0) {
+            for (int i = 0; i < model.getRowCount(); i++) {
+                int newProId = Integer.parseInt(model.getValueAt(i, 1).toString());
+                if (newProId == proId) {
+                    return true;
+                }
+            }
+
+        }
+
+        return false;
+    }
 
     private void jTextField3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField3ActionPerformed
         // TODO add your handling code here:
@@ -317,8 +466,8 @@ public class Purchase extends javax.swing.JFrame {
     }//GEN-LAST:event_jTextField1ActionPerformed
 
     private void jPanel1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MousePressed
-       xx = evt.getX();
-       xy = evt.getY();
+        xx = evt.getX();
+        xy = evt.getY();
     }//GEN-LAST:event_jPanel1MousePressed
 
     private void jPanel1MouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MouseDragged
@@ -328,29 +477,66 @@ public class Purchase extends javax.swing.JFrame {
     }//GEN-LAST:event_jPanel1MouseDragged
 
     private void jLabel11MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel11MouseClicked
+      setDefault();
+
+        
+    }//GEN-LAST:event_jLabel11MouseClicked
+
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+        for (double i = 0.1; i <= 1.0; i += 0.1) {
+            String s = "" + i;
+            float f = Float.parseFloat(s);
+            this.setOpacity(f);
+            try {
+                Thread.sleep(40);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(LogIn.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        }
+    }//GEN-LAST:event_formWindowOpened
+
+    private void jTextField4KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField4KeyTyped
+        if (!Character.isDigit(evt.getKeyChar())) {
+            evt.consume();
+        }
+    }//GEN-LAST:event_jTextField4KeyTyped
+
+    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
+        model = (DefaultTableModel) jTable1.getModel();
+        rowIndex = jTable1.getSelectedRow();
+        jTextField3.setText(model.getValueAt(rowIndex, 1).toString());
+        String s1 = model.getValueAt(rowIndex, 3).toString();
+        String s2 = model.getValueAt(rowIndex, 4).toString();
+        qty = Integer.parseInt(s1);
+        price = Double.parseDouble(s2);
+
+    }//GEN-LAST:event_jTable1MouseClicked
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        clear();
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        //String email = userDashboard.userEmail.getText();
+        MessageFormat header = new MessageFormat("Receipt-->  "+"Email"+"Total:"+total);
+        MessageFormat footer = new MessageFormat("Page{0, nember, integer");
+        try {
+            jTable2.print(JTable.PrintMode.FIT_WIDTH,header, footer);
+        } catch (PrinterException ex) {
+            Logger.getLogger(Purchase.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    public void setDefault() {
         setVisible(false);
         userDashboard.jPanel7.setBackground(primaryColor);
         userDashboard.jLabel8.setBackground(primaryColor);
         userDashboard.jPanel7.setForeground(textPrimaryColor);
-        //userDashboard.jLabel8.setVisible(true);
-       // userDashboard.jLabel7.setVisible(true);
+        userDashboard.jLabel8.setVisible(true);
 
-    }//GEN-LAST:event_jLabel11MouseClicked
-
-    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-        for(double i = 0.1; i<=1.0; i +=0.1){
-          String s = ""+i;
-          float f = Float.parseFloat(s);
-          this.setOpacity(f);
-          try {
-              Thread.sleep(40);
-          } catch (InterruptedException ex) {
-              Logger.getLogger(LogIn.class.getName()).log(Level.SEVERE, null, ex);
-          }
-     
-              
-              }
-    }//GEN-LAST:event_formWindowOpened
+    }
 
     /**
      * @param args the command line arguments

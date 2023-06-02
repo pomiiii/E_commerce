@@ -1,4 +1,4 @@
-package User;
+ package User;
 
 import dao.userDao;
 import java.awt.Color;
@@ -132,6 +132,11 @@ public class SignUp extends javax.swing.JFrame {
                 jTextField3ActionPerformed(evt);
             }
         });
+        jTextField3.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jTextField3KeyTyped(evt);
+            }
+        });
 
         jLabel7.setFont(new java.awt.Font("Segoe UI Semibold", 0, 14)); // NOI18N
         jLabel7.setText("Security Questions");
@@ -172,6 +177,11 @@ public class SignUp extends javax.swing.JFrame {
         jTextField5.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextField5ActionPerformed(evt);
+            }
+        });
+        jTextField5.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jTextField5KeyTyped(evt);
             }
         });
 
@@ -241,14 +251,14 @@ public class SignUp extends javax.swing.JFrame {
                 .addComponent(jLabel10)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel5)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(8, 8, 8)
+                        .addComponent(jLabel5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPasswordField1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGap(32, 32, 32)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel11)
                             .addComponent(jLabel9))))
@@ -323,7 +333,10 @@ public class SignUp extends javax.swing.JFrame {
             //if(jTextField4.getText().isEmpty()){
             //JOptionPane.showMessageDialog(this, "Address is required", "Warning",2);
             //return false;
-
+        //}
+          //if(jTextfield7.getText().isEmpty()){
+          //JoptionPane.showMessageDialog(this, "Address line 2 required", "Warning", 2);
+           //return 
         }
 
         return true;
@@ -370,7 +383,7 @@ public class SignUp extends javax.swing.JFrame {
     }//GEN-LAST:event_btnBackActionPerformed
 
     private void jLabel11MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel11MouseClicked
-        jPasswordField1.setEchoChar((char) 0);
+        jPasswordField1.setEchoChar((char)0);
         jLabel11.setVisible(false);
         jLabel9.setVisible(true);
     }//GEN-LAST:event_jLabel11MouseClicked
@@ -402,9 +415,10 @@ public class SignUp extends javax.swing.JFrame {
             String email = jTextField2.getText();
             String password = String.valueOf(jPasswordField1.getPassword()).toString();
             String phone = jTextField3.getText();
-            String secqus = jComboBox1.getSelectedItem().toString();
+            String secqus = jTextField5.getText();
             String ans = jTextField4.getText();
-            //String address = 
+            //String address1 =  jTextField4.getText();
+            //String address2 =  jTextField4.getText();
             if (!user.isEmailExist(email)) {
                 if (!user.isPhoneExist(phone)) {
                    user.insert(id, username, email, password, phone, secqus, ans);
@@ -421,40 +435,21 @@ public class SignUp extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnSignUpActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(SignUp.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(SignUp.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(SignUp.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(SignUp.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
+    private void jTextField5KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField5KeyTyped
+        //char input = evt.getKeyChar();
+         //if (!(input  < '0' || input > '9') && input != '\b') {
+           //  evt.consume();
+           //  JOptionPane.showMessageDialog(this, "Username doesn't contain any numbers","");
+         //}
+    }//GEN-LAST:event_jTextField5KeyTyped
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new SignUp().setVisible(true);
-            }
-        });
-    }
+    private void jTextField3KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField3KeyTyped
+        if (!Character.isDigit(evt.getKeyChar())) {
+            evt.consume();
+        }
+    }//GEN-LAST:event_jTextField3KeyTyped
+
+  
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBack;
