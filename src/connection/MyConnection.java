@@ -9,7 +9,7 @@ import java.io.IOException;
 
 
 public class MyConnection {
-    public static final String username = "root";//dont forget to set your mysql username
+    public static final String username = "root";
     public static final String password = "PFH#23kgrw9";
     public static final String url = "jdbc:mysql://localhost:3306/e_commerce";
     public static Connection con = null;

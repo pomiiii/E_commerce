@@ -104,7 +104,7 @@ public class SignIn extends javax.swing.JFrame {
         new SignUp().setVisible(true);
        this.dispose();
     }//GEN-LAST:event_jButton1MouseClicked
-
+//hello
     private void jButton2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton2MouseClicked
         new LogIn().setVisible(true);
         this.dispose();
