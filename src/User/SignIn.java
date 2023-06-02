@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
+
 package User;
 
 import java.sql.SQLException;
@@ -95,7 +92,7 @@ public class SignIn extends javax.swing.JFrame {
                 .addGap(272, 272, 272))
         );
 
-        getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1200, 670));
+        getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(-80, 10, 1200, 670));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
